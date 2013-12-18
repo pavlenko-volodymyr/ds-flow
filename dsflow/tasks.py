@@ -7,7 +7,10 @@ from fabric.api import local, prompt, task, quiet
 from fabric.colors import green, cyan, red
 from fabric.contrib.console import confirm
 
-from settings import GITHUB, UPSTREAM_ONLY, BRANCH_FORMAT_STRING, GIT_REMOTE_NAME, GIT_DEFAULT_BASE
+from settings import (
+    GITHUB, UPSTREAM_ONLY, BRANCH_FORMAT_STRING,
+    GIT_REMOTE_NAME, GIT_DEFAULT_BASE, PULL_REQUEST_MSG_PREFIX
+)
 from utils import get_commit_message, get_branch_name, post
 
 
@@ -77,9 +80,10 @@ def pull_request(message=None, base=GIT_DEFAULT_BASE):
     print(cyan("Sending pull request to %s/%s." % (GIT_REMOTE_NAME, base)))
 
     if confirm(green('Default message: %s' % get_commit_message(message=message))):
-        title = get_commit_message(message=message)
+        title = get_commit_message(message=message, branch_name=PULL_REQUEST_MSG_PREFIX)
     else:
-        title = get_commit_message(message=prompt(green("Enter message: ")))
+        title = get_commit_message(message=prompt(green("Enter message: ")),
+                                   branch_name=PULL_REQUEST_MSG_PREFIX)
 
     data = {
         "title": title,
@@ -140,4 +144,4 @@ def finish(message=None, force=False, need_rebase=False, add_first=False, base=G
 
 @task
 def fix(base=GIT_DEFAULT_BASE):
-    change(number="quick-fix", prefix="", base=base)
+    change(number="quick-fix", base=base)

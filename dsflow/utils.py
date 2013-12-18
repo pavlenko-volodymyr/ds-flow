@@ -3,7 +3,7 @@ from functools import wraps, partial
 from fabric.api import local, quiet
 from requests import post
 
-from settings import GITHUB
+from settings import GITHUB, PULL_REQUEST_MSG_PREFIX
 
 ALIAS = {
     '-f': 'force',
@@ -35,11 +35,11 @@ def get_branch_name():
         return local("git rev-parse --abbrev-ref HEAD", capture=True)
 
 
-def get_commit_message(message=None):
+def get_commit_message(message=None, branch_name=None):
     if not message:
         return get_last_commit_message()
     else:
-        branch_name = get_branch_name()
+        branch_name = branch_name or get_branch_name()
         return "%s, %s" % (branch_name.capitalize(), message)
 
 
